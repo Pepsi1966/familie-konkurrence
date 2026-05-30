@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Familiernes Store Udfordring 🏆</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #F5A623;
+    --gold-light: #FDE68A;
+    --green: #22C55E;
+    --red: #EF4444;
+    --blue: #3B82F6;
+    --purple: #8B5CF6;
+    --bg: #0F172A;
+    --card: #1E293B;
+    --card2: #263348;
+    --border: #334155;
+    --text: #F1F5F9;
+    --muted: #94A3B8;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 20px 16px 24px;
+    text-align: center;
+    border-bottom: 2px solid var(--gold);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(245,166,35,0.15) 0%, transparent 70%);
+  }
+  .header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(22px, 6vw, 36px);
+    color: var(--gold);
+    letter-spacing: 1px;
+    position: relative;
+  }
+  .header p { font-size: 13px; color: var(--muted); margin-top: 4px; position: relative; }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    flex: 1; min-width: 80px;
+    padding: 12px 8px;
+    background: none; border: none;
+    color: var(--muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; font-weight: 700;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .nav-btn .nav-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+
+  /* PAGES */
+  .page { display: none; padding: 16px; max-width: 600px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px; color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 12px 20px;
+    border: none; border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    cursor: pointer; transition: all 0.15s;
+    width: 100%;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-gold { background: var(--gold); color: #1a1000; }
+  .btn-gold:hover { background: #f0b84a; }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-sm { padding: 7px 14px; font-size: 13px; width: auto; border-radius: 8px; }
+
+  /* INPUT */
+  input, select, textarea {
+    width: 100%; padding: 12px 14px;
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 15px;
+    margin-bottom: 10px; outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+  label { font-size: 13px; color: var(--muted); font-weight: 700; margin-bottom: 4px; display: block; }
+
+  /* SCOREBOARD */
+  .score-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: var(--card2);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s;
+  }
+  .score-rank {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px; min-width: 32px; text-align: center;
+  }
+  .rank-1 { color: #FFD700; }
+  .rank-2 { color: #C0C0C0; }
+  .rank-3 { color: #CD7F32; }
+  .score-name { flex: 1; font-weight: 800; font-size: 16px; }
+  .score-pts {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px; color: var(--gold);
+  }
+  .score-bar-wrap { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-top: 4px; }
+  .score-bar { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.5s; }
+
+  /* TASK */
+  .task-box {
+    background: linear-gradient(135deg, #1e3a5f, #1a2d4a);
+    border: 2px solid var(--blue);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .task-type-badge {
+    display: inline-block;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .badge-quiz { background: rgba(139,92,246,0.3); color: #c4b5fd; border: 1px solid #8b5cf6; }
+  .badge-fysisk { background: rgba(34,197,94,0.3); color: #86efac; border: 1px solid #22c55e; }
+  .badge-kreativ { background: rgba(245,166,35,0.3); color: var(--gold); border: 1px solid var(--gold); }
+  .badge-foto { background: rgba(59,130,246,0.3); color: #93c5fd; border: 1px solid #3b82f6; }
+  .task-question {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(18px, 5vw, 24px);
+    line-height: 1.3; margin-bottom: 8px;
+  }
+  .task-points {
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .answer-options { display: flex; flex-direction: column; gap: 8px; }
+  .answer-btn {
+    padding: 12px 16px;
+    background: var(--card2); border: 2px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; text-align: left; transition: all 0.15s;
+  }
+  .answer-btn:hover { border-color: var(--blue); background: rgba(59,130,246,0.1); }
+  .answer-btn.correct { border-color: var(--green); background: rgba(34,197,94,0.2); color: #86efac; }
+  .answer-btn.wrong { border-color: var(--red); background: rgba(239,68,68,0.15); }
+
+  /* STATUS BADGES */
+  .badge-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+  }
+  .pill-green { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.4); }
+  .pill-gold { background: rgba(245,166,35,0.2); color: var(--gold); border: 1px solid rgba(245,166,35,0.4); }
+  .pill-red { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); }
+
+  /* ADMIN */
+  .admin-team-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--card2); border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .admin-team-name { flex: 1; font-weight: 700; }
+  .point-ctrl { display: flex; align-items: center; gap: 8px; }
+  .point-btn {
+    width: 32px; height: 32px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-size: 18px; font-weight: 800;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .point-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .point-display {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px; color: var(--gold);
+    min-width: 40px; text-align: center;
+  }
+
+  /* SETUP */
+  .team-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 12px;
+    font-size: 14px; font-weight: 700;
+    margin: 4px;
+  }
+  .team-chip-remove {
+    cursor: pointer; color: var(--muted);
+    font-size: 16px; line-height: 1;
+    background: none; border: none; color: var(--red);
+    padding: 0;
+  }
+  #teams-container { margin-bottom: 10px; min-height: 40px; }
+
+  /* CONNECTION */
+  .conn-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block; margin-right: 6px;
+  }
+  .conn-online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .conn-offline { background: var(--red); }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 20px;
+    font-weight: 700; font-size: 14px;
+    opacity: 0; transition: opacity 0.3s;
+    z-index: 999; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  #toast.show { opacity: 1; }
+
+  /* WAITING */
+  .waiting-screen {
+    text-align: center; padding: 40px 20px;
+  }
+  .waiting-screen .big-emoji { font-size: 64px; margin-bottom: 16px; }
+  .waiting-screen h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 24px; color: var(--gold); margin-bottom: 8px;
+  }
+  .waiting-screen p { color: var(--muted); font-size: 14px; }
+
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+  .row { display: flex; gap: 8px; }
+  .row .btn { flex: 1; }
+  .section-label {
+    font-size: 11px; font-weight: 800; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .mt8 { margin-top: 8px; }
+  .mt16 { margin-top: 16px; }
+  select option { background: var(--card2); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏆 Familiernes Store Udfordring</h1>
+  <p id="conn-status"><span class="conn-dot conn-offline" id="conn-dot"></span>Forbinder...</p>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('hold')" id="nav-hold">
+    <span class="nav-icon">👥</span>Hold
+  </button>
+  <button class="nav-btn" onclick="showPage('opgave')" id="nav-opgave">
+    <span class="nav-icon">📋</span>Opgave
+  </button>
+  <button class="nav-btn" onclick="showPage('point')" id="nav-point">
+    <span class="nav-icon">🏅</span>Point
+  </button>
+  <button class="nav-btn" onclick="showPage('admin')" id="nav-admin">
+    <span class="nav-icon">⚙️</span>Admin
+  </button>
+</nav>
+
+<!-- HOLD PAGE -->
+<div class="page active" id="page-hold">
+  <div id="hold-setup">
+    <div class="card">
+      <div class="card-title">Vælg dit hold</div>
+      <label>Holdnavn</label>
+      <select id="hold-select"><option value="">-- Vælg hold --</option></select>
+      <label>Dit navn</label>
+      <input type="text" id="spiller-navn" placeholder="Skriv dit navn...">
+      <button class="btn btn-gold mt8" onclick="joinHold()">Tilslut hold 👋</button>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:14px; color: var(--muted);">Ingen hold synlige endnu?</div>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:10px;">Administratoren skal oprette holdene først under ⚙️ Admin → Opsætning.</p>
+    </div>
+  </div>
+
+  <div id="hold-joined" style="display:none;">
+    <div class="card" style="border-color: var(--green); background: linear-gradient(135deg, #0f2d1a, #1a3a25);">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div>
+          <div style="font-size:12px; color:var(--muted); font-weight:700; margin-bottom:4px;">DU SPILLER PÅ</div>
+          <div id="joined-holdnavn" style="font-family:'Fredoka One',cursive; font-size:28px; color:var(--green);"></div>
+          <div id="joined-navn" style="font-size:14px; color:var(--muted); margin-top:2px;"></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; color:var(--muted); font-weight:700;">POINT</div>
+          <div id="hold-egne-point" style="font-family:'Fredoka One',cursive; font-size:36px; color:var(--gold);">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Aktuel status</div>
+      <div id="hold-status-text" style="color:var(--muted); font-size:14px;">Venter på at konkurrencen starter...</div>
+    </div>
+    <button class="btn btn-outline" onclick="leaveHold()" style="margin-top:8px;">Skift hold</button>
+  </div>
+</div>
+
+<!-- OPGAVE PAGE -->
+<div class="page" id="page-opgave">
+  <div id="opgave-waiting" class="waiting-screen">
+    <div class="big-emoji">⏳</div>
+    <h2>Ingen aktiv opgave</h2>
+    <p>Administratoren starter en opgave,<br>så dukker den op her automatisk.</p>
+  </div>
+  <div id="opgave-active" style="display:none;">
+    <div class="task-box" id="task-container"></div>
+    <div id="svar-sektion" style="display:none;">
+      <div class="card">
+        <div class="card-title">Dit svar</div>
+        <textarea id="svar-input" rows="3" placeholder="Skriv jeres svar her..."></textarea>
+        <button class="btn btn-green" onclick="indsendSvar()">Send svar 📨</button>
+      </div>
+    </div>
+    <div id="svar-sendt" class="card" style="display:none; text-align:center; border-color:var(--green);">
+      <div style="font-size:48px; margin-bottom:8px;">✅</div>
+      <div style="font-family:'Fredoka One',cursive; font-size:20px; color:var(--green);">Svar sendt!</div>
+      <div style="font-size:13px; color:var(--muted); margin-top:4px;">Venter på at admin godkender...</div>
+    </div>
+  </div>
+</div>
+
+<!-- POINT PAGE -->
+<div class="page" id="page-point">
+  <div class="card">
+    <div class="card-title">🏆 Pointtavle</div>
+    <div id="scoreboard-list">
+      <div style="text-align:center; color:var(--muted); padding:20px; font-size:14px;">Ingen hold endnu...</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:4px;">
+    <div style="font-size:12px; color:var(--muted); text-align:center;">Opdateres automatisk i realtid ⚡</div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+  <div id="admin-login-screen">
+    <div class="card">
+      <div class="card-title">⚙️ Admin-adgang</div>
+      <label>Admin-kodeord</label>
+      <input type="password" id="admin-pw-input" placeholder="Skriv kodeord..." onkeydown="if(event.key==='Enter')adminLogin()">
+      <button class="btn btn-gold mt8" onclick="adminLogin()">Log ind</button>
+    </div>
+  </div>
+
+  <div id="admin-panel" style="display:none;">
+
+    <!-- Opsætning -->
+    <div class="card">
+      <div class="card-title">👥 Hold-opsætning</div>
+      <label>Tilføj hold</label>
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <input type="text" id="nyt-hold-input" placeholder="Holdnavn..." style="margin:0; flex:1;" onkeydown="if(event.key==='Enter')tilfoejHold()">
+        <button class="btn btn-gold btn-sm" onclick="tilfoejHold()" style="white-space:nowrap;">+ Tilføj</button>
+      </div>
+      <div id="teams-container"></div>
+      <button class="btn btn-outline btn-sm" onclick="gemHold()">Gem hold 💾</button>
+    </div>
+
+    <!-- Aktiv opgave -->
+    <div class="card">
+      <div class="card-title">📋 Start opgave</div>
+      <label>Type</label>
+      <select id="opgave-type">
+        <option value="quiz">🧠 Quiz-spørgsmål</option>
+        <option value="fysisk">🏃 Fysisk udfordring</option>
+        <option value="kreativ">🎨 Kreativ opgave</option>
+        <option value="foto">📸 Fotojagt</option>
+      </select>
+      <label>Spørgsmål / Opgavebeskrivelse</label>
+      <textarea id="opgave-tekst" rows="3" placeholder="Skriv opgaven her..."></textarea>
+      <label>Point ved korrekt svar</label>
+      <input type="number" id="opgave-point" value="10" min="1" max="100">
+      <div id="quiz-svar-sektion">
+        <label>Korrekt svar (til quiz)</label>
+        <input type="text" id="korrekt-svar" placeholder="Det rigtige svar...">
+      </div>
+      <div class="row mt8">
+        <button class="btn btn-green" onclick="startOpgave()">▶ Start opgave</button>
+        <button class="btn btn-red" onclick="stopOpgave()">⏹ Stop</button>
+      </div>
+    </div>
+
+    <!-- Svar-godkendelse -->
+    <div class="card">
+      <div class="card-title">✅ Indkomne svar</div>
+      <div id="svar-liste">
+        <div style="color:var(--muted); font-size:14px;">Ingen svar endnu...</div>
+      </div>
+    </div>
+
+    <!-- Point-justering -->
+    <div class="card">
+      <div class="card-title">🎯 Juster point manuelt</div>
+      <div id="admin-teams-list"></div>
+    </div>
+
+    <button class="btn btn-outline" onclick="adminLogout()" style="margin-top:8px;">Log ud af admin</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAKMCoTFou7OyxJlhROOQVoAZJATwTcLlo",
+  authDomain: "familie-konkurrence.firebaseapp.com",
+  projectId: "familie-konkurrence",
+  storageBucket: "familie-konkurrence.firebasestorage.app",
+  messagingSenderId: "282906534481",
+  appId: "1:282906534481:web:d6a52d5fe9b6fbf94ece70"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ── STATE ─────────────────────────────────────────────────
+let mitHold = null;
+let mitNavn = '';
+let isAdmin = false;
+let adminHold = [];
+let aktivOpgave = null;
+let svarSendt = false;
+
+const ADMIN_PW = 'familie2024';
+
+// ── HELPERS ───────────────────────────────────────────────
+window.showToast = function(msg, ms=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
+
+window.showPage = function(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+}
+
+// ── CONNECTION ────────────────────────────────────────────
+async function checkConnection() {
+  try {
+    await getDoc(doc(db, '_ping', 'ping'));
+    setConnected(true);
+  } catch(e) { setConnected(false); }
+}
+function setConnected(ok) {
+  document.getElementById('conn-dot').className = 'conn-dot ' + (ok ? 'conn-online' : 'conn-offline');
+  document.getElementById('conn-status').innerHTML =
+    `<span class="conn-dot ${ok ? 'conn-online' : 'conn-offline'}" id="conn-dot"></span>${ok ? 'Forbundet ⚡' : 'Ikke forbundet'}`;
+}
+checkConnection();
+
+// ── HOLD ──────────────────────────────────────────────────
+onSnapshot(doc(db, 'game', 'holds'), snap => {
+  const data = snap.data();
+  adminHold = data ? (data.holds || []) : [];
+  updateHoldSelect();
+  updateAdminTeamsList();
+  updateScoreboard();
+});
+
+function updateHoldSelect() {
+  const sel = document.getElementById('hold-select');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- Vælg hold --</option>';
+  adminHold.forEach(h => {
+    const o = document.createElement('option');
+    o.value = h.navn;
+    o.textContent = h.navn;
+    sel.appendChild(o);
+  });
+  if(cur) sel.value = cur;
+}
+
+window.joinHold = function() {
+  const holdNavn = document.getElementById('hold-select').value;
+  const navn = document.getElementById('spiller-navn').value.trim();
+  if(!holdNavn) { showToast('❌ Vælg et hold'); return; }
+  if(!navn) { showToast('❌ Skriv dit navn'); return; }
+  mitHold = holdNavn;
+  mitNavn = navn;
+  document.getElementById('hold-setup').style.display = 'none';
+  document.getElementById('hold-joined').style.display = 'block';
+  document.getElementById('joined-holdnavn').textContent = holdNavn;
+  document.getElementById('joined-navn').textContent = 'Spiller: ' + navn;
+  updateHoldPoint();
+  showToast('✅ Du er tilsluttet ' + holdNavn + '!');
+}
+
+window.leaveHold = function() {
+  mitHold = null; mitNavn = '';
+  document.getElementById('hold-setup').style.display = 'block';
+  document.getElementById('hold-joined').style.display = 'none';
+}
+
+function updateHoldPoint() {
+  if(!mitHold) return;
+  const h = adminHold.find(h => h.navn === mitHold);
+  if(h) document.getElementById('hold-egne-point').textContent = h.point || 0;
+}
+
+// ── SCOREBOARD ────────────────────────────────────────────
+function updateScoreboard() {
+  const sorted = [...adminHold].sort((a,b) => (b.point||0)-(a.point||0));
+  const maxPt = sorted.length ? (sorted[0].point || 1) : 1;
+  const container = document.getElementById('scoreboard-list');
+  if(!sorted.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:14px;">Ingen hold endnu...</div>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  container.innerHTML = sorted.map((h,i) => `
+    <div class="score-row">
+      <div class="score-rank ${i<3?'rank-'+(i+1):''}">${medals[i] || (i+1)}</div>
+      <div style="flex:1;">
+        <div class="score-name">${h.navn}</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${Math.max(4,(h.point||0)/maxPt*100)}%"></div></div>
+      </div>
+      <div class="score-pts">${h.point||0}</div>
+    </div>
+  `).join('');
+  if(mitHold) updateHoldPoint();
+}
+
+// ── OPGAVE ────────────────────────────────────────────────
+onSnapshot(doc(db, 'game', 'aktivOpgave'), snap => {
+  const data = snap.data();
+  if(data && data.aktiv) {
+    aktivOpgave = data;
+    svarSendt = false;
+    visOpgave(data);
+  } else {
+    aktivOpgave = null;
+    document.getElementById('opgave-waiting').style.display = 'block';
+    document.getElementById('opgave-active').style.display = 'none';
+    document.getElementById('hold-status-text').textContent = 'Venter på næste opgave...';
+  }
+});
+
+function visOpgave(data) {
+  document.getElementById('opgave-waiting').style.display = 'none';
+  document.getElementById('opgave-active').style.display = 'block';
+  document.getElementById('svar-sendt').style.display = 'none';
+
+  const typeLabels = { quiz:'Quiz', fysisk:'Fysisk', kreativ:'Kreativ', foto:'Fotojagt' };
+  const typeBadge = { quiz:'badge-quiz', fysisk:'badge-fysisk', kreativ:'badge-kreativ', foto:'badge-foto' };
+
+  document.getElementById('task-container').innerHTML = `
+    <span class="task-type-badge ${typeBadge[data.type]||'badge-quiz'}">${typeLabels[data.type]||'Opgave'}</span>
+    <div class="task-question">${data.tekst}</div>
+    <div class="task-points">⭐ ${data.point} point</div>
+  `;
+
+  if(mitHold) {
+    document.getElementById('svar-sektion').style.display = 'block';
+    document.getElementById('svar-input').value = '';
+    document.getElementById('hold-status-text').textContent = '📋 Der er en aktiv opgave!';
+  } else {
+    document.getElementById('svar-sektion').style.display = 'none';
+    document.getElementById('hold-status-text').textContent = '📋 Aktiv opgave — tilslut et hold for at svare!';
+  }
+}
+
+window.indsendSvar = async function() {
+  if(!mitHold) { showToast('❌ Du er ikke tilsluttet et hold'); return; }
+  const svar = document.getElementById('svar-input').value.trim();
+  if(!svar) { showToast('❌ Skriv et svar først'); return; }
+  await addDoc(collection(db, 'svar'), {
+    hold: mitHold,
+    navn: mitNavn,
+    svar: svar,
+    opgaveId: aktivOpgave?.id || 'ukendt',
+    timestamp: Date.now(),
+    status: 'afventer'
+  });
+  svarSendt = true;
+  document.getElementById('svar-sektion').style.display = 'none';
+  document.getElementById('svar-sendt').style.display = 'block';
+  showToast('📨 Svar sendt!');
+}
+
+// ── ADMIN ─────────────────────────────────────────────────
+window.adminLogin = function() {
+  const pw = document.getElementById('admin-pw-input').value;
+  if(pw === ADMIN_PW) {
+    isAdmin = true;
+    document.getElementById('admin-login-screen').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    loadSvar();
+    renderAdminHold();
+    showToast('✅ Admin-adgang godkendt');
+  } else {
+    showToast('❌ Forkert kodeord');
+  }
+}
+
+window.adminLogout = function() {
+  isAdmin = false;
+  document.getElementById('admin-login-screen').style.display = 'block';
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-pw-input').value = '';
+}
+
+// Hold management
+let lokalHold = [];
+window.tilfoejHold = function() {
+  const input = document.getElementById('nyt-hold-input');
+  const navn = input.value.trim();
+  if(!navn) return;
+  if(lokalHold.find(h=>h.navn===navn)) { showToast('Hold findes allerede'); return; }
+  lokalHold.push({navn, point:0});
+  renderAdminHold();
+  input.value = '';
+}
+
+function renderAdminHold() {
+  lokalHold = [...adminHold];
+  const c = document.getElementById('teams-container');
+  c.innerHTML = lokalHold.map(h => `
+    <div class="team-chip">
+      ${h.navn}
+      <button class="team-chip-remove" onclick="fjernHold('${h.navn}')">✕</button>
+    </div>
+  `).join('');
+}
+
+window.fjernHold = function(navn) {
+  lokalHold = lokalHold.filter(h => h.navn !== navn);
+  const c = document.getElementById('teams-container');
+  c.innerHTML = lokalHold.map(h => `
+    <div class="team-chip">
+      ${h.navn}
+      <button class="team-chip-remove" onclick="fjernHold('${h.navn}')">✕</button>
+    </div>
+  `).join('');
+}
+
+window.gemHold = async function() {
+  // Merge points from existing
+  const merged = lokalHold.map(h => {
+    const ex = adminHold.find(e=>e.navn===h.navn);
+    return { navn: h.navn, point: ex ? (ex.point||0) : 0 };
+  });
+  await setDoc(doc(db, 'game', 'holds'), { holds: merged });
+  showToast('✅ Hold gemt!');
+}
+
+function updateAdminTeamsList() {
+  const c = document.getElementById('admin-teams-list');
+  if(!c || !adminHold.length) {
+    if(c) c.innerHTML = '<div style="color:var(--muted);font-size:14px;">Opret hold i opsætningen først.</div>';
+    return;
+  }
+  c.innerHTML = adminHold.map(h => `
+    <div class="admin-team-row">
+      <div class="admin-team-name">${h.navn}</div>
+      <div class="point-ctrl">
+        <button class="point-btn" onclick="justerPoint('${h.navn}', -5)">−</button>
+        <div class="point-display">${h.point||0}</div>
+        <button class="point-btn" onclick="justerPoint('${h.navn}', 5)">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.justerPoint = async function(holdNavn, delta) {
+  const holds = adminHold.map(h => h.navn === holdNavn
+    ? {...h, point: Math.max(0,(h.point||0)+delta)}
+    : h);
+  await setDoc(doc(db, 'game', 'holds'), { holds });
+}
+
+// Opgave admin
+window.startOpgave = async function() {
+  const tekst = document.getElementById('opgave-tekst').value.trim();
+  if(!tekst) { showToast('❌ Skriv en opgave'); return; }
+  const opgave = {
+    aktiv: true,
+    type: document.getElementById('opgave-type').value,
+    tekst,
+    point: parseInt(document.getElementById('opgave-point').value)||10,
+    korrektSvar: document.getElementById('korrekt-svar').value.trim(),
+    id: Date.now().toString(),
+    startet: Date.now()
+  };
+  await setDoc(doc(db, 'game', 'aktivOpgave'), opgave);
+  showToast('▶ Opgave startet!');
+}
+
+window.stopOpgave = async function() {
+  await setDoc(doc(db, 'game', 'aktivOpgave'), { aktiv: false });
+  showToast('⏹ Opgave stoppet');
+}
+
+// Svar
+function loadSvar() {
+  onSnapshot(collection(db, 'svar'), snap => {
+    const svar = [];
+    snap.forEach(d => svar.push({id:d.id, ...d.data()}));
+    const afventer = svar.filter(s => s.status === 'afventer').sort((a,b)=>a.timestamp-b.timestamp);
+    renderSvarListe(afventer);
+  });
+}
+
+function renderSvarListe(svar) {
+  const c = document.getElementById('svar-liste');
+  if(!svar.length) {
+    c.innerHTML = '<div style="color:var(--muted);font-size:14px;">Ingen afventende svar...</div>';
+    return;
+  }
+  c.innerHTML = svar.map(s => `
+    <div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+        <div>
+          <span style="font-weight:800;">${s.hold}</span>
+          <span style="font-size:12px;color:var(--muted);margin-left:6px;">${s.navn}</span>
+        </div>
+        <span class="badge-pill pill-gold">Afventer</span>
+      </div>
+      <div style="font-size:15px;margin-bottom:10px;">"${s.svar}"</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-green btn-sm" onclick="godkendSvar('${s.id}','${s.hold}',${s.point||aktivOpgave?.point||10})">✅ +${s.point||aktivOpgave?.point||10}p</button>
+        <button class="btn btn-red btn-sm" onclick="afvisSvar('${s.id}')">❌ Afvis</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.godkendSvar = async function(svarId, holdNavn, point) {
+  await updateDoc(doc(db, 'svar', svarId), { status: 'godkendt' });
+  const holds = adminHold.map(h => h.navn === holdNavn
+    ? {...h, point: (h.point||0)+point}
+    : h);
+  await setDoc(doc(db, 'game', 'holds'), { holds });
+  showToast('✅ Svar godkendt! +' + point + ' point til ' + holdNavn);
+}
+
+window.afvisSvar = async function(svarId) {
+  await updateDoc(doc(db, 'svar', svarId), { status: 'afvist' });
+  showToast('❌ Svar afvist');
+}
+
+// Init
+document.getElementById('opgave-type').addEventListener('change', function() {
+  document.getElementById('quiz-svar-sektion').style.display = this.value === 'quiz' ? 'block' : 'none';
+});
+</script>
+</body>
+</html>
