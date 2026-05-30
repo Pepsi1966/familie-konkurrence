@@ -660,18 +660,27 @@ window.adminLogout = function() {
 
 // Hold management
 let lokalHold = [];
+let lokalHoldInitialiseret = false;
+
 window.tilfoejHold = function() {
   const input = document.getElementById('nyt-hold-input');
   const navn = input.value.trim();
   if(!navn) return;
   if(lokalHold.find(h=>h.navn===navn)) { showToast('Hold findes allerede'); return; }
   lokalHold.push({navn, point:0});
-  renderAdminHold();
+  renderTeamsContainer();
   input.value = '';
 }
 
 function renderAdminHold() {
-  lokalHold = [...adminHold];
+  if(!lokalHoldInitialiseret) {
+    lokalHold = [...adminHold];
+    lokalHoldInitialiseret = true;
+  }
+  renderTeamsContainer();
+}
+
+function renderTeamsContainer() {
   const c = document.getElementById('teams-container');
   c.innerHTML = lokalHold.map(h => `
     <div class="team-chip">
@@ -683,13 +692,7 @@ function renderAdminHold() {
 
 window.fjernHold = function(navn) {
   lokalHold = lokalHold.filter(h => h.navn !== navn);
-  const c = document.getElementById('teams-container');
-  c.innerHTML = lokalHold.map(h => `
-    <div class="team-chip">
-      ${h.navn}
-      <button class="team-chip-remove" onclick="fjernHold('${h.navn}')">✕</button>
-    </div>
-  `).join('');
+  renderTeamsContainer();
 }
 
 window.gemHold = async function() {
@@ -698,8 +701,15 @@ window.gemHold = async function() {
     const ex = adminHold.find(e=>e.navn===h.navn);
     return { navn: h.navn, point: ex ? (ex.point||0) : 0 };
   });
-  await setDoc(doc(db, 'game', 'holds'), { holds: merged });
-  showToast('✅ Hold gemt!');
+  try {
+    console.log('Forsøger at gemme hold:', JSON.stringify(merged));
+    await setDoc(doc(db, 'game', 'holds'), { holds: merged });
+    console.log('Hold gemt succesfuldt!');
+    showToast('✅ Hold gemt!');
+  } catch(e) {
+    console.error('FEJL ved gem hold:', e);
+    showToast('❌ Fejl: ' + e.message);
+  }
 }
 
 function updateAdminTeamsList() {
